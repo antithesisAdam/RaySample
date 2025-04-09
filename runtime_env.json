@@ -1,0 +1,8 @@
+{
+    "excludes": [
+        "venv/",
+        "result/",
+        "venv/lib64/",
+        "venv/lib/"
+    ]
+}
