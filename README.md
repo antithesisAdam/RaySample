@@ -7,7 +7,7 @@ This project is a proof-of-concept (PoC) built on the â€œLearning to Play Pongâ€
 Podman Container Setup:
 
 ```mkdir -p ~/ray_temp```
-```podman run -d --replace --name ray-head --network=host \
+```podman run -d --replace --name ray-head --network=host \   \n
   -v ~/ray_temp:/tmp/ray \
   --user $(id -u):$(id -g) \
   -e RAY_NODE_IP_ADDRESS=127.0.0.1 \
