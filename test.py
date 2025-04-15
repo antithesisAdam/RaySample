@@ -1,27 +1,16 @@
 import ray
+import time
+import socket
 
-# Define a runtime environment that excludes large, unnecessary files/directories.
-runtime_env = {
-    "excludes": [
-        "venv/",  # Exclude the entire virtual environment if not needed.
-        # Alternatively, exclude specific large paths:
-        "venv/lib64/python3.10/site-packages/nvidia/",
-        "venv/lib64/python3.10/site-packages/torch/",
-        "venv/lib64/python3.10/site-packages/triton/",
-        "venv/lib/python3.10/site-packages/nvidia/",
-        "venv/lib/python3.10/site-packages/torch/",
-        "venv/lib/python3.10/site-packages/triton/",
-        "result/"  # Exclude output directories if not needed.
-    ]
-}
-
-# Connect explicitly to the head node with the runtime_env.
-ray.init(address="127.0.0.1:6379", runtime_env=runtime_env)
+ray.init(address="auto")  # or your Ray address
 
 @ray.remote
-def get_hostname():
-    import socket
+def heavy_task(seconds):
+    """Simulate a longer task."""
+    time.sleep(seconds)
     return socket.gethostname()
 
-futures = [get_hostname.remote() for _ in range(4)]
-print("Node hostnames:", ray.get(futures))
+# Launch more tasks than a single node can handle quickly
+futures = [heavy_task.remote(3) for _ in range(100)]
+results = ray.get(futures)
+print(results)
