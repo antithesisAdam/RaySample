@@ -2,17 +2,10 @@
     "excludes": [
       ".git/",
       "venv/",
-      "result/",
-      "venv/lib/",
-      "venv/lib64/",
-      "venv/bin/",
-      "venv/include/",
-      "venv/lib/python3.10/site-packages/nvidia/",
-      "venv/lib64/python3.10/site-packages/nvidia/",
-      "venv/lib/python3.10/site-packages/torch/",
-      "venv/lib64/python3.10/site-packages/torch/",
-      "venv/lib/python3.10/site-packages/triton/",
-      "venv/lib64/python3.10/site-packages/triton/"
+      "result/"
+    ],
+    "pip": [
+      "ale-py==0.10.1"
     ]
   }
   
