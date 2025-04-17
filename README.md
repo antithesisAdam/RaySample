@@ -151,3 +151,39 @@ podman run -d --name ray-worker-1 \
   rayproject/ray:latest \
   ray start --address=127.0.0.1:6379 \
             --disable-usage-stats --block
+
+
+
+Submit a job:
+
+ray job submit   --address http://127.0.0.1:8265   --working-dir ~/ray_job   --runtime-env-json '{
+      "pip": [
+        "gymnasium[accept-rom-license]==0.29.1",
+        "shimmy[atari]==0.2.1",
+        "ale-py==0.8.1"
+      ]
+    }'   -- python py-pong.py
+
+
+    odman rm -f ray-head ray-worker-1 2>/dev/null
+
+podman run -d --name ray-head \
+  -p 6379:6379 -p 8265:8265 \
+  --user $(id -u):$(id -g) \
+  -e RAY_NODE_IP_ADDRESS=127.0.0.1 \
+  rayproject/ray:latest \
+  ray start --head --port=6379 \
+            --dashboard-host=0.0.0.0 --dashboard-port=8265 \
+            --disable-usage-stats --block          # no --temp-dir
+
+# worker
+podman run -d --name ray-worker-1 \
+  --network host \
+  --user $(id -u):$(id -g) \
+  rayproject/ray:latest \
+  ray start --address=127.0.0.1:6379 \
+            --disable-usage-stats --block
+
+
+
+ray job stop 06000000 --address http://127.0.0.1:8265
