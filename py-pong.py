@@ -5,7 +5,7 @@ import gymnasium as gym
 import numpy as np
 from gymnasium.envs.registration import register
 from shimmy.atari_env import AtariEnv
-
+ray.init(address="auto")  
 # ✅ Manually register ALE/Pong-v5 (through Shimmy)
 register(
     id="ALE/Pong-v5",

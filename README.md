@@ -129,3 +129,25 @@ Copy
    git add README.md
    git commit -m "Add README file"
    git push
+
+
+   Command to get pods to work
+
+   podman rm -f ray-head ray-worker-1 2>/dev/null
+
+podman run -d --name ray-head \
+  -p 6379:6379 -p 8265:8265 \
+  --user $(id -u):$(id -g) \
+  -e RAY_NODE_IP_ADDRESS=127.0.0.1 \
+  rayproject/ray:latest \
+  ray start --head --port=6379 \
+            --dashboard-host=0.0.0.0 --dashboard-port=8265 \
+            --disable-usage-stats --block          # no --temp-dir
+
+# worker
+podman run -d --name ray-worker-1 \
+  --network host \
+  --user $(id -u):$(id -g) \
+  rayproject/ray:latest \
+  ray start --address=127.0.0.1:6379 \
+            --disable-usage-stats --block
