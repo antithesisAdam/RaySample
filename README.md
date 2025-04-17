@@ -129,7 +129,3 @@ Copy
    git add README.md
    git commit -m "Add README file"
    git push
-
-   #Troubleshooting
-
-   pip install shimmy==1.2.0
