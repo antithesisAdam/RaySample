@@ -21,8 +21,6 @@ podman run -d --replace --name ray-head --network=host \
   -e RAY_PUBLIC_IP=127.0.0.1 \
   rayproject/ray:latest \
   ray start --head --port=6379 --dashboard-host=0.0.0.0 --disable-usage-stats --block --temp-dir=/tmp/ray
-
-
 Similarly, start the worker container:
 
 bash
@@ -131,3 +129,7 @@ Copy
    git add README.md
    git commit -m "Add README file"
    git push
+
+   #Troubleshooting
+
+   pip install shimmy==1.2.0
