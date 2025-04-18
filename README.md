@@ -154,6 +154,11 @@ podman run -d --name ray-worker-1 \
 
 
 
+#virtual deactivate
+
+deactivate
+-----------------------------
+
 Submit a job:
 
 ray job submit   --address http://127.0.0.1:8265   --working-dir ~/ray_job   --runtime-env-json '{
@@ -187,3 +192,4 @@ podman run -d --name ray-worker-1 \
 
 
 ray job stop 06000000 --address http://127.0.0.1:8265
+
