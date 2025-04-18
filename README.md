@@ -211,4 +211,36 @@ rebuild your image:
 
 podman build -t donkey-ray-sample:latest .
 
+<<<<<<< HEAD
 podman exec -it ray-head python /app/py-pong.py
+=======
+
+------------------------
+
+python -m ray job submit \
+  --address http://127.0.0.1:8265 \
+  --working-dir "$(pwd)" \
+  --runtime-env-json '{"pip": ["-r requirements.txt"]}' \
+  -- python py-pong.py
+
+
+ ray job submit   --address http://127.0.0.1:8265   --working-dir ~/Documents/Github/RaySample   --runtime-env-json '{
+    "pip": ["-r requirements.txt"]
+  }'   -- python py-pong.py
+
+
+  ---------------------------
+
+  ray job submit \
+  --address http://127.0.0.1:8265 \
+  --working-dir ~/Documents/Github/RaySample \
+  --runtime-env-json '{
+    "pip": ["-r requirements.txt"],
+    "excludes": [
+      ".git",
+      "result/bin",
+      "result/libexec"
+    ]
+  }' \
+  -- python py-pong.py
+>>>>>>> 30db171 (Changes)
