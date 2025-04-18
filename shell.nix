@@ -1,32 +1,31 @@
 { pkgs ? import <nixpkgs> {} }:
 
 let
-  python = pkgs.python310;
-  libPaths = pkgs.lib.concatStringsSep ":" [
-    "${pkgs.stdenv.cc.cc.lib}/lib"
-    "${pkgs.zlib}/lib"
-  ];
+  python = pkgs.python310Full;   # full CPython with ensurepip/venv
 in
+
 pkgs.mkShell {
   buildInputs = [
     python
-    python.pkgs.pip
     pkgs.zlib
     pkgs.stdenv.cc.cc.lib
   ];
 
   shellHook = ''
-    export LD_LIBRARY_PATH=${libPaths}:$LD_LIBRARY_PATH
-    echo "🐍 Creating venv if not exists..."
-    if [ ! -d "./venv" ]; then
-      ${python.interpreter} -m venv venv
-      source ./venv/bin/activate
-      pip install --upgrade pip
-      pip install numpy==1.26.4 torch ray gymnasium
-    else
-      source ./venv/bin/activate
-    fi
+    export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.zlib}/lib:$LD_LIBRARY_PATH"
 
-    echo "✅ venv ready. Run: python py-pong.py"
+    # bootstrap your venv if it doesn't exist
+    if [ ! -d .venv ]; then
+      python3 -m venv .venv
+    fi
+    source .venv/bin/activate
+
+    # install everything from requirements.txt in one go
+    python -m pip install --upgrade pip
+    python -m pip install -r requirements.txt
+
+    echo "✅ venv ready – just:"
+    echo "    export RAY_ADDRESS=127.0.0.1:6379"
+    echo "    python py-pong-ray.py"
   '';
 }

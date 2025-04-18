@@ -151,3 +151,8 @@ podman run -d --name ray-worker-1 \
   rayproject/ray:latest \
   ray start --address=127.0.0.1:6379 \
             --disable-usage-stats --block
+
+
+#virtual deactivate
+
+deactivate
