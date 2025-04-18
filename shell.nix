@@ -1,30 +1,27 @@
 { pkgs ? import <nixpkgs> {} }:
 
 let
-  py = pkgs.python310;
-  pypkgs = pkgs.python310Packages;
+  pythonEnv = pkgs.python310.withPackages (ps: with ps; [
+    numpy
+    ray
+    gymnasium       # for gymnasium core
+    shimmy          # for `shimmy.atari_env`
+    ale-py          # for ALE/Pong ROM support
+  ]);
 in
 
 pkgs.mkShell {
+  # give us python + all of the above installed
   buildInputs = [
-    # pre‑built Python packages
-    pypkgs.numpy
-    pypkgs.ray
-    pypkgs.gymnasium
-    pypkgs.shimmy
-    pypkgs.ale_py
-
-    # system libs for numpy C‑extensions
-    pkgs.zlib
-    pkgs.stdenv.cc.cc.lib
+    pythonEnv
+    pkgs.zlib       # C‐library for numpy/zlib support
   ];
 
-  # so that numpy can find zlib & libstdc++
   shellHook = ''
-    export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.zlib}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-    echo "🐍  Ready! Just:"
-    echo "    pip install --upgrade pip"
-    echo "    pip install gymnasium[accept-rom-license] shimmy==1.2.0"
+    # so numpy C‐exts can find zlib
+    export LD_LIBRARY_PATH="${pkgs.zlib.lib}/lib:$LD_LIBRARY_PATH"
+
+    echo "🐍  Ready!"
     echo "    export RAY_ADDRESS=127.0.0.1:6379"
     echo "    python py-pong-ray.py"
   '';

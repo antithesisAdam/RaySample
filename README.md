@@ -165,7 +165,7 @@ ray job submit   --address http://127.0.0.1:8265   --working-dir ~/ray_job   --r
     }'   -- python py-pong.py
 
 
-    odman rm -f ray-head ray-worker-1 2>/dev/null
+    podman rm -f ray-head ray-worker-1 2>/dev/null
 
 podman run -d --name ray-head \
   -p 6379:6379 -p 8265:8265 \
@@ -187,3 +187,20 @@ podman run -d --name ray-worker-1 \
 
 
 ray job stop 06000000 --address http://127.0.0.1:8265
+
+
+
+
+
+------------------------
+
+python -m ray job submit \
+  --address http://127.0.0.1:8265 \
+  --working-dir "$(pwd)" \
+  --runtime-env-json '{"pip": ["-r requirements.txt"]}' \
+  -- python py-pong.py
+
+
+ ray job submit   --address http://127.0.0.1:8265   --working-dir ~/Documents/Github/RaySample   --runtime-env-json '{
+    "pip": ["-r requirements.txt"]
+  }'   -- python py-pong.py
