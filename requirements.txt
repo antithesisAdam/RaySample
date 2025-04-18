@@ -1,4 +1,3 @@
-# ~/ray_job/requirements.txt
 gymnasium[accept-rom-license]==0.29.1
 shimmy[atari]==0.2.1
 ale-py==0.8.1

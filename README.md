@@ -204,3 +204,19 @@ python -m ray job submit \
  ray job submit   --address http://127.0.0.1:8265   --working-dir ~/Documents/Github/RaySample   --runtime-env-json '{
     "pip": ["-r requirements.txt"]
   }'   -- python py-pong.py
+
+
+  ---------------------------
+
+  ray job submit \
+  --address http://127.0.0.1:8265 \
+  --working-dir ~/Documents/Github/RaySample \
+  --runtime-env-json '{
+    "pip": ["-r requirements.txt"],
+    "excludes": [
+      ".git",
+      "result/bin",
+      "result/libexec"
+    ]
+  }' \
+  -- python py-pong.py
