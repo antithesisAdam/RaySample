@@ -156,16 +156,23 @@ podman run -d --name ray-worker-1 \
 
 Submit a job:
 
-ray job submit   --address http://127.0.0.1:8265   --working-dir ~/ray_job   --runtime-env-json '{
-      "pip": [
-        "gymnasium[accept-rom-license]==0.29.1",
-        "shimmy[atari]==0.2.1",
-        "ale-py==0.8.1"
-      ]
-    }'   -- python py-pong.py
+ray job submit \
+  --address http://127.0.0.1:8265 \
+  --working-dir ~/ray_job \
+  --runtime-env-json '{
+    "pip": [
+      "gymnasium[accept-rom-license]==0.29.1",
+      "shimmy[atari]==0.2.1",
+      "ale-py==0.8.1"
+    ],
+    "excludes": [".git"]
+  }' \
+  -- python py-pong.py
 
 
-    podman rm -f ray-head ray-worker-1 2>/dev/null
+----------------------------------------
+
+podman rm -f ray-head ray-worker-1 2>/dev/null
 
 podman run -d --name ray-head \
   -p 6379:6379 -p 8265:8265 \
