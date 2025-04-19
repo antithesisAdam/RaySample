@@ -165,12 +165,13 @@ ray job submit   --address http://127.0.0.1:8265   --working-dir ~/ray_job   --r
       "pip": [
         "gymnasium[accept-rom-license]==0.29.1",
         "shimmy[atari]==0.2.1",
-        "ale-py==0.8.1"
+        "ale-py==0.8.1",
+        "ray[default]"
       ]
     }'   -- python py-pong.py
 
 
-    odman rm -f ray-head ray-worker-1 2>/dev/null
+    podman rm -f ray-head ray-worker-1 2>/dev/null
 
 podman run -d --name ray-head \
   -p 6379:6379 -p 8265:8265 \
@@ -193,3 +194,31 @@ podman run -d --name ray-worker-1 \
 
 ray job stop 06000000 --address http://127.0.0.1:8265
 
+
+
+
+
+----------------------
+
+# 1) Remove any existing head/worker
+podman rm -f ray-head ray-worker-1 2>/dev/null
+
+# 2) Start the head node on host networking:
+podman run -d --name ray-head \
+  --network host \
+  --user "$(id -u):$(id -g)" \
+  rayproject/ray:latest \
+  ray start --head \
+            --port=6379 \
+            --dashboard-host=0.0.0.0 --dashboard-port=8265 \
+            --disable-usage-stats \
+            --block
+
+# 3) Start a worker that joins the head:
+podman run -d --name ray-worker-1 \
+  --network host \
+  --user "$(id -u):$(id -g)" \
+  rayproject/ray:latest \
+  ray start --address=127.0.0.1:6379 \
+            --disable-usage-stats \
+            --block

@@ -5,6 +5,8 @@ import gymnasium as gym
 import numpy as np
 from gymnasium.envs.registration import register
 from shimmy.atari_env import AtariEnv
+from antithesis import assert_always, assert_eventually
+
 ray.init(address="auto")  
 # ✅ Manually register ALE/Pong-v5 (through Shimmy)
 register(
@@ -140,6 +142,10 @@ while True:
         reward_sum = 0
         observation, _ = env.reset()
         prev_x = None
+
+    # never let the policy network weights go NaN
+    assert_always(np.isfinite(model["W1"]).all(), "W1 went NaN!")
+
 
     if reward != 0:
         print(f"ep {episode_number}: game finished, reward: {reward:.2f}" + ("" if reward == -1 else " !!!!!!!!"))
