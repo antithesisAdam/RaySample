@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  ray-head:
+    image: ray-pong-poc:latest
+    network_mode: "host"           # so you can use host ports directly
+    user: "${UID}:${GID}"          # run as your uid/gid
+    environment:
+      - RAY_DISABLE_SETUP_HOOKS=1  # skip autorom in container
+    command: >
+      ray start --head
+        --port=6379
+        --dashboard-host=0.0.0.0
+        --dashboard-port=8265
+        --disable-usage-stats
+        --block
+
+  # (optional) add a worker if you want multi‐node
+  ray-worker:
+    image: ray-pong-poc:latest
+    network_mode: "host"
+    user: "${UID}:${GID}"
+    command: >
+      ray start
+        --address=127.0.0.1:6379
+        --disable-usage-stats
+        --block

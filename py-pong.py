@@ -2,10 +2,11 @@
 
 import ray
 import gymnasium as gym
+from antithesis.assertions import always as assert_always
 import numpy as np
 from gymnasium.envs.registration import register
 from shimmy.atari_env import AtariEnv
-from antithesis import assert_always, assert_eventually
+from antithesis.assertions import always, sometimes
 
 ray.init(address="auto")  
 # ✅ Manually register ALE/Pong-v5 (through Shimmy)
@@ -144,7 +145,11 @@ while True:
         prev_x = None
 
     # never let the policy network weights go NaN
-    assert_always(np.isfinite(model["W1"]).all(), "W1 went NaN!")
+    assert_always(
+     "W1 finite",
+     bool(np.isfinite(model["W1"]).all()),    # ← wrap in bool()
+     "W1 went NaN!"
+ )
 
 
     if reward != 0:

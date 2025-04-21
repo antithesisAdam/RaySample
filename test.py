@@ -1,16 +1,22 @@
+# test.py
+
 import ray
-import time
-import socket
 
-ray.init(address="auto")  # or your Ray address
+def main():
+    # 1️⃣ Connect to your head node
+    ray.init(address="192.168.68.106:6379")
 
-@ray.remote
-def heavy_task(seconds):
-    """Simulate a longer task."""
-    time.sleep(seconds)
-    return socket.gethostname()
+    @ray.remote
+    def ping():
+        return "pong"
 
-# Launch more tasks than a single node can handle quickly
-futures = [heavy_task.remote(3) for _ in range(100)]
-results = ray.get(futures)
-print(results)
+    # 2️⃣ Fire off the remote task and print the result
+    result = ray.get(ping.remote())
+    print(f"Ping remote returned: {result}")
+
+    # 3️⃣ Print out cluster resources
+    resources = ray.cluster_resources()
+    print("Cluster resources:", resources)
+
+if __name__ == "__main__":
+    main()

@@ -171,37 +171,11 @@ ray job submit   --address http://127.0.0.1:8265   --working-dir ~/ray_job   --r
     }'   -- python py-pong.py
 
 
-    podman rm -f ray-head ray-worker-1 2>/dev/null
-
-podman run -d --name ray-head \
-  -p 6379:6379 -p 8265:8265 \
-  --user $(id -u):$(id -g) \
-  -e RAY_NODE_IP_ADDRESS=127.0.0.1 \
-  rayproject/ray:latest \
-  ray start --head --port=6379 \
-            --dashboard-host=0.0.0.0 --dashboard-port=8265 \
-            --disable-usage-stats --block          # no --temp-dir
-
-# worker
-podman run -d --name ray-worker-1 \
-  --network host \
-  --user $(id -u):$(id -g) \
-  rayproject/ray:latest \
-  ray start --address=127.0.0.1:6379 \
-            --disable-usage-stats --block
-
-
-
-ray job stop 06000000 --address http://127.0.0.1:8265
-
-
-
-
-
 ----------------------
 
 # 1) Remove any existing head/worker
-podman rm -f ray-head ray-worker-1 2>/dev/null
+podman rm -f ray-head ray-worker ray-worker-2 || true
+
 
 # 2) Start the head node on host networking:
 podman run -d --name ray-head \
@@ -222,3 +196,19 @@ podman run -d --name ray-worker-1 \
   ray start --address=127.0.0.1:6379 \
             --disable-usage-stats \
             --block
+
+ray job stop 06000000 --address http://127.0.0.1:8265
+ 
+--------------------------
+
+#Get it to work with Antithesis
+
+# From the root of your RaySample repo
+docker build --platform linux/amd64 -t ray-pong-poc:latest .
+
+
+rebuild your image: 
+
+podman build -t donkey-ray-sample:latest .
+
+podman exec -it ray-head python /app/py-pong.py
