@@ -112,3 +112,19 @@ venv.bak/
 .vscode/
 
 # IDE
+.idea/
+
+# Antithesis & Ray demo artifacts
+donkey-ray-sample.tar
+*.tar
+
+# Local runtime config / secrets
+*.key.json
+antithesis.yaml
+runtime-env.json
+
+# Antithesis test harness (optional)
+test/opt/antithesis/
+
+# Docker / Podman exports
+*.tar

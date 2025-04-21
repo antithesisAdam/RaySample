@@ -1,4 +1,0 @@
-tenant: ray-pong-poc
-config_dir: ./config
-compose_file: docker-compose.yaml
-tests_dir: ./test
