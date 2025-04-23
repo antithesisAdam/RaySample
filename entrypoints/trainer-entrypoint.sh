@@ -1,21 +1,39 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "⏳ waiting for full cluster…"
-# give the worker up to ~20s to join
-until python3 <<'EOF'
-import ray, time, sys
-ray.init(address='auto')
-for _ in range(20):
-    if len(ray.nodes()) > 1:
-        sys.exit(0)
-    time.sleep(1)
-sys.exit(1)
-EOF
-do
-  echo "⏳ cluster not ready yet…"
+echo "⏳ waiting for head at head:6379…"
+until bash -c "echo > /dev/tcp/head/6379" 2>/dev/null; do
   sleep 2
+  echo "⏳ still waiting for head…"
 done
+echo "✅ head is up!"
 
-echo "✅ cluster ready—starting training"
-exec python3 py-pong.py
+echo "⏳ waiting for dashboard at head:8265…"
+until bash -c "echo > /dev/tcp/head/8265" 2>/dev/null; do
+  sleep 2
+  echo "⏳ still waiting for dashboard…"
+done
+echo "✅ dashboard is up!"
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "⏳ submitting py-pong.py as a Ray Job…"
+ray job submit \
+  --address http://head:8265 \
+  --working-dir /app \
+  --runtime-env-json '{
+    "excludes": [
+      ".git",
+      "result/bin",
+      "result/libexec"
+    ]
+  }' \
+  -- python py-pong.py
+
+echo "✅ Ray Job finished."
+
+# docker-compose build
+# docker-compose up -d
+
+# docker-compose logs -f trainer

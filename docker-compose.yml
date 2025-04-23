@@ -2,16 +2,17 @@ version: "3.8"
 
 services:
   head:
+    build: .
     image: donkey-ray-sample:latest
     container_name: ray-head
     command: >
-      bash -lc "ray start \
+      ray start \
         --head \
         --port=6379 \
         --dashboard-host=0.0.0.0 \
         --dashboard-port=8265 \
         --disable-usage-stats \
-        --block"
+        --block
     ports:
       - "6379:6379"
       - "8265:8265"
@@ -23,7 +24,7 @@ services:
     container_name: ray-worker
     depends_on:
       - head
-    entrypoint: ["./entrypoints/worker-entrypoint.sh"]
+    entrypoint: [ "./entrypoints/worker-entrypoint.sh" ]
     volumes:
       - .:/app
 
@@ -34,6 +35,6 @@ services:
       - head
       - worker
     working_dir: /app
-    entrypoint: ["./entrypoints/trainer-entrypoint.sh"]
+    entrypoint: [ "./entrypoints/trainer-entrypoint.sh" ]
     volumes:
       - .:/app
