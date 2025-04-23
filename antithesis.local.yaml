@@ -1,0 +1,38 @@
+# antithesis.local.yaml
+
+name: ray-pong-sample
+platform: docker        # we’re launching containers
+
+services:
+  head:
+    image: donkey-ray-sample:latest
+    mode: head
+    command: >
+      ray start
+        --head
+        --port=6379
+        --dashboard-host=0.0.0.0
+        --dashboard-port=8265
+        --disable-usage-stats
+    ports:
+      - 6379:6379
+      - 8265:8265
+
+  worker:
+    image: donkey-ray-sample:latest
+    mode: worker
+    command: >
+      ray start
+        --address=127.0.0.1:6379
+        --disable-usage-stats
+
+jobs:
+  smoke_test:
+    description: “Verify the cluster is up”
+    working_dir: /app
+    run: python test.py
+
+  pong_demo:
+    description: “Run the Pong sample”
+    working_dir: /app
+    run: python py-pong.py

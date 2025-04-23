@@ -161,22 +161,21 @@ deactivate
 
 Submit a job:
 
-ray job submit   --address http://127.0.0.1:8265   --working-dir ~/ray_job   --runtime-env-json '{
-      "pip": [
-        "gymnasium[accept-rom-license]==0.29.1",
-        "shimmy[atari]==0.2.1",
-        "ale-py==0.8.1",
-        "ray[default]"
-      ]
-    }'   -- python py-pong.py
-
-
-----------------------
+ray job submit \
+  --address http://127.0.0.1:8265 \
+  --working-dir ~/ray_job \
+  --runtime-env-json '{
+    "pip": [
+      "gymnasium[accept-rom-license]==0.29.1",
+      "shimmy[atari]==0.2.1",
+      "ale-py==0.8.1"
+    ],
+    "excludes": [".git"]
+  }' \
+  -- python py-pong.py
 
 # 1) Remove any existing head/worker
 podman rm -f ray-head ray-worker ray-worker-2 || true
-
-
 # 2) Start the head node on host networking:
 podman run -d --name ray-head \
   --network host \
@@ -199,7 +198,7 @@ podman run -d --name ray-worker-1 \
 
 ray job stop 06000000 --address http://127.0.0.1:8265
  
---------------------------
+
 
 #Get it to work with Antithesis
 
@@ -211,11 +210,8 @@ rebuild your image:
 
 podman build -t donkey-ray-sample:latest .
 
-<<<<<<< HEAD
 podman exec -it ray-head python /app/py-pong.py
-=======
 
-------------------------
 
 python -m ray job submit \
   --address http://127.0.0.1:8265 \
@@ -229,7 +225,6 @@ python -m ray job submit \
   }'   -- python py-pong.py
 
 
-  ---------------------------
 
   ray job submit \
   --address http://127.0.0.1:8265 \
@@ -243,4 +238,49 @@ python -m ray job submit \
     ]
   }' \
   -- python py-pong.py
->>>>>>> 30db171 (Changes)
+
+
+
+cd ~/Documents/Github/RaySample
+podman build -t donkey-ray-sample:latest .
+
+
+# 2) (Re‑)deploy locally via Woodchipper
+customer woodchipper.local
+
+# 3) Wait for the run to finish
+customer woodchipper.local status --wait
+
+# 4) Grab the HTML triage report
+customer woodchipper.local report triage \
+  --output ray-demo-triage.html
+
+# 5) Verify and open it
+ls -lh ray-demo-triage.html
+xdg-open ray-demo-triage.html
+
+
+-----------------------
+
+
+
+docker-compose exec head bash -lc '
+  python3 - <<EOF
+import ray, time
+ray.init(address="auto")
+# give worker up to ~10s to register
+for _ in range(5):
+    if len(ray.nodes())>1: break
+    time.sleep(2)
+print("Active nodes:", len(ray.nodes()))
+for n in ray.nodes():
+    print(" •", n["NodeID"][:8], "@", n["NodeManagerAddress"], "alive?", n["Alive"])
+EOF
+'
+
+# stop existing Ray on worker
+docker-compose exec worker bash -lc "ray stop"
+
+# restart it pointing at the head:
+docker-compose exec worker bash -lc \
+  "ray start --address=head:6379 --disable-usage-stats --block"

@@ -1,0 +1,29 @@
+# ~/.dockerignore
+
+# don’t copy Git metadata or Nix build caches
+.git
+.gitignore
+/run/user
+/result
+*.tar
+
+# your Python venv
+.venv/
+venv/
+env/
+
+# build outputs & caches
+__pycache__/
+*.pyc
+build/
+dist/
+*.egg-info
+
+# documentation, local notes, test fixtures you don’t need inside the container
+docs/
+test/
+test/opt/
+antithesis.yaml
+antithesis.local.yaml
+entrypoint.sh       # (we COPY this explicitly below)
+README.md

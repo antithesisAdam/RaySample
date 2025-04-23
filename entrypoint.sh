@@ -1,24 +1,38 @@
 #!/usr/bin/env bash
-# entrypoint.sh
 set -euo pipefail
 
-# Decide role based on RAY_MODE (default to head)
-if [ "${RAY_MODE:-head}" = "head" ]; then
-  exec ray start --head \
-       --port=6379 \
-       --dashboard-host=0.0.0.0 \
-       --dashboard-port=8265 \
-       --disable-usage-stats \
-       --block
+ROLE="$1"
+shift
 
-elif [ "${RAY_MODE}" = "worker" ]; then
-  # RAY_ADDRESS should be like "head-ip:6379"
-  exec ray start --address="${RAY_ADDRESS:-127.0.0.1:6379}" \
-       --disable-usage-stats \
-       --block
-
-else
-  # Fallback: run any provided command
-  exec "$@"
-fi
- 
+case "$ROLE" in
+  head)
+    echo "🔨 Starting Ray head node…"
+    exec ray start \
+      --head \
+      --port=6379 \
+      --dashboard-host=0.0.0.0 \
+      --dashboard-port=8265 \
+      --disable-usage-stats \
+      --block
+    ;;
+  worker)
+    echo "⏳ Waiting for head at head:6379…"
+    # loop until the head is listening
+    until bash -c "echo > /dev/tcp/head/6379"; do
+      sleep 1
+    done
+    echo "✅ Head is up—joining cluster"
+    exec ray start \
+      --address=head:6379 \
+      --disable-usage-stats \
+      --block
+    ;;
+  trainer)
+    echo "🚂 Running trainer script…"
+    exec python py-pong.py "$@"
+    ;;
+  *)
+    echo "❌ Unknown role: $ROLE" >&2
+    exit 1
+    ;;
+esac

@@ -14,6 +14,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install Antithesis SDK for instrumentation
+RUN pip install --no-cache-dir antithesis
+
 # Copy your code
 COPY . .
 
