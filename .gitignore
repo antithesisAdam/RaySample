@@ -128,3 +128,11 @@ test/opt/antithesis/
 
 # Docker / Podman exports
 *.tar
+*.gz
+*.dmg
+docker-compose.override.yml
+Dockerfile.prod
+
+# Ignore Docker images, volumes, and unnecessary build artifacts
+*.image
+*.volume
