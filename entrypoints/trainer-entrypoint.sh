@@ -35,5 +35,19 @@ echo "✅ Ray Job finished."
 
 # docker-compose build
 # docker-compose up -d
+# docker-compose down
 
 # docker-compose logs -f trainer
+
+
+# docker images
+# The program 'docker' is not in your PATH. It is provided by several packages.
+# You can make it available in an ephemeral shell by typing one of the following:
+#   nix-shell -p docker
+#   nix-shell -p docker-client
+#   nix-shell -p docker_25
+#   nix-shell -p docker_26
+#   nix-shell -p docker_28
+#   nix-shell -p nvidia-container-toolkit
+
+#fix this

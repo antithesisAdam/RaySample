@@ -284,3 +284,6 @@ docker-compose exec worker bash -lc "ray stop"
 # restart it pointing at the head:
 docker-compose exec worker bash -lc \
   "ray start --address=head:6379 --disable-usage-stats --block"
+
+  # If you’re still using docker-compose v1:
+docker-compose logs -f trainer
