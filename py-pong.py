@@ -10,8 +10,10 @@ import pickle
 import ray
 import gymnasium as gym
 import numpy as np
+import json
 from gymnasium.envs.registration import register
 from antithesis.assertions import always as assert_always
+#from antithesis.runtime import Runtime  # <-- NEW LINE (import Runtime)
 
 # 1. Ray init: auto connects to head+workers in your cluster
 ray.init(address="auto")
@@ -23,7 +25,6 @@ register(
     kwargs={"game": "pong", "obs_type": "rgb"},
     max_episode_steps=10000,
 )
-
 
 # -------------------------------------------------------------------
 # 3. All your existing preprocessing, network, discount, etc.
@@ -48,7 +49,7 @@ def discount_rewards(r):
     discounted_r = np.zeros_like(r, dtype=np.float32)
     running_add = 0.0
     for t in reversed(range(r.size)):
-        if r[t] != 0:  # game boundary (pong) 
+        if r[t] != 0:  # game boundary (pong)
             running_add = 0.0
         running_add = running_add * gamma + r[t]
         discounted_r[t] = running_add
@@ -66,7 +67,6 @@ def policy_backward(eph, epdlogp, epx, model):
     dh[eph <= 0] = 0
     dW1 = np.dot(dh.T, epx)
     return {"W1": dW1, "W2": dW2}
-
 
 # -------------------------------------------------------------------
 # 4. Remote Episode Roll-out + Gradient Computation
@@ -117,7 +117,6 @@ def train_episode(remote_weights: dict):
             grads = policy_backward(eph, epdlogp, epx, remote_weights)
             return grads, total_reward
 
-
 # -------------------------------------------------------------------
 # 5. Driver: initialize model & run distributed training loop
 # -------------------------------------------------------------------
@@ -126,6 +125,9 @@ if __name__ == "__main__":
     BATCH_SIZE    = 10    # number of episodes per update
     LEARNING_RATE = 1e-4
     RESUME        = False
+
+    # Antithesis setup complete signal
+    #Runtime.signal_setup_complete()  # <-- NEW LINE (signal setup)
 
     # 5.1 initialize or resume model
     if RESUME and os.path.exists("save.p"):

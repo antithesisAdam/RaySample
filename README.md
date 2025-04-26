@@ -287,3 +287,6 @@ docker-compose exec worker bash -lc \
 
   # If you’re still using docker-compose v1:
 docker-compose logs -f trainer
+
+
+#docker ps | grep woodchipper

@@ -2,8 +2,6 @@ services:
   head:
     image: ray-sample:latest
     container_name: ray-head
-
-    # 1) completely override any baked-in ENTRYPOINT
     entrypoint: ["bash", "-c", "ray start \
       --head \
       --port=6379 \
@@ -11,35 +9,30 @@ services:
       --dashboard-port=8265 \
       --disable-usage-stats \
       --block"]
-
-    # you don't need 'command:' here because
-    # the entire invocation lives in entrypoint above
-
     ports:
       - "6379:6379"
       - "8265:8265"
-
     volumes:
-      - .:/app
+      - .:/app  # ✅ FIXED
 
   worker:
     image: ray-sample:latest
     container_name: ray-worker
     depends_on:
       - head
-    entrypoint: ["./entrypoints/worker-entrypoint.sh"]
+    working_dir: /app
+    entrypoint: ["bash", "/app/entrypoints/worker-entrypoint.sh"]
+
     volumes:
-      - .:/app
+      - .:/app  # ✅ FIXED
 
   trainer:
     image: ray-sample:latest
     container_name: ray-trainer
-
-
     depends_on:
       - head
       - worker
     working_dir: /app
-    entrypoint: ["./entrypoints/trainer-entrypoint.sh"]
+    entrypoint: ["bash", "/app/entrypoints/trainer-entrypoint.sh"]
     volumes:
-      - .:/app
+      - .:/app  # ✅ FIXED
