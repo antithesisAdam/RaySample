@@ -12,6 +12,7 @@ import gymnasium as gym
 import numpy as np
 import json
 from gymnasium.envs.registration import register
+
 from antithesis.assertions import always as assert_always
 #from antithesis.runtime import Runtime  # <-- NEW LINE (import Runtime)
 
@@ -19,6 +20,7 @@ from antithesis.assertions import always as assert_always
 ray.init(address="auto")
 
 # 2. (Shimmy) register the Gym Pong env
+
 register(
     id="ALE/Pong-v5",
     entry_point="shimmy.atari_env:AtariEnv",
@@ -182,4 +184,17 @@ if __name__ == "__main__":
         # periodically save
         if episode_number % 100 == 0:
             pickle.dump(model, open("save.p", "wb"))
+<<<<<<< HEAD
             print("Model snapshot saved.")
+=======
+        reward_sum = 0
+        observation, _ = env.reset()
+        prev_x = None
+
+    # never let the policy network weights go NaN
+    assert_always(np.isfinite(model["W1"]).all(), "W1 went NaN!")
+
+
+    if reward != 0:
+        print(f"ep {episode_number}: game finished, reward: {reward:.2f}" + ("" if reward == -1 else " !!!!!!!!"))
+>>>>>>> main

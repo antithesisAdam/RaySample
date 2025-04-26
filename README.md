@@ -173,6 +173,14 @@ ray job submit \
     "excludes": [".git"]
   }' \
   -- python py-pong.py
+<<<<<<< HEAD
+=======
+
+
+----------------------------------------
+
+podman rm -f ray-head ray-worker-1 2>/dev/null
+>>>>>>> main
 
 # 1) Remove any existing head/worker
 podman rm -f ray-head ray-worker ray-worker-2 || true
@@ -226,6 +234,31 @@ python -m ray job submit \
 
 
 
+<<<<<<< HEAD
+=======
+ray job stop 06000000 --address http://127.0.0.1:8265
+
+
+
+
+
+------------------------
+
+python -m ray job submit \
+  --address http://127.0.0.1:8265 \
+  --working-dir "$(pwd)" \
+  --runtime-env-json '{"pip": ["-r requirements.txt"]}' \
+  -- python py-pong.py
+
+
+ ray job submit   --address http://127.0.0.1:8265   --working-dir ~/Documents/Github/RaySample   --runtime-env-json '{
+    "pip": ["-r requirements.txt"]
+  }'   -- python py-pong.py
+
+
+  ---------------------------
+
+>>>>>>> main
   ray job submit \
   --address http://127.0.0.1:8265 \
   --working-dir ~/Documents/Github/RaySample \
@@ -238,6 +271,7 @@ python -m ray job submit \
     ]
   }' \
   -- python py-pong.py
+<<<<<<< HEAD
 
 
 
@@ -290,3 +324,5 @@ docker-compose logs -f trainer
 
 
 #docker ps | grep woodchipper
+=======
+>>>>>>> main

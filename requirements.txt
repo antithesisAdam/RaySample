@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 ray[default]==2.44.1
 gymnasium[accept-rom-license]==0.29.1
 shimmy[atari]==0.2.1
 ale-py==0.8.1
 antithesis  
+=======
+gymnasium[accept-rom-license]==0.29.1
+shimmy[atari]==0.2.1
+ale-py==0.8.1
+ray==2.44.1
+numpy==1.26.4
+>>>>>>> main
