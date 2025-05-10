@@ -1,0 +1,64 @@
+Below is an example of how you might tweak your existing Ray‑based Dockerfile so that it also packages in the Antithesis Python SDK (so your code can call antithesis.assertions etc.) and remains runnable by Ray in an offline environment:
+
+dockerfile
+Copy
+Edit
+# Dockerfile
+FROM docker.io/rayproject/ray:2.44.1-python3.10
+
+# 0) Ensure we build for x86_64 (Antithesis runs on AMD64)
+#    you’ll still pass --platform linux/amd64 on your `docker build` command
+
+USER root
+WORKDIR /app
+
+# 1) Copy & install your Python dependencies, including antithesis SDK
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt antithesis
+
+# 2) Copy in your application code
+COPY . .
+
+# 3) Expose Ray ports so Antithesis (and you locally) can talk to the dashboard
+EXPOSE 6379 8265
+
+# 4) Default to launching Ray in head mode. Your Compose/antithesis config
+#    will override this to actually run your tests or app entrypoint.
+CMD ["ray", "start", "--head", "--port=6379", \
+     "--dashboard-host=0.0.0.0", "--dashboard-port=8265", \
+     "--disable-usage-stats", "--block"]
+What changed
+pip install antithesis
+We add the Antithesis Python SDK beside your existing deps so that when your code (e.g. from antithesis.assertions import sometimes) runs under Antithesis, all the SDK tooling is present.
+
+Architecture flag
+Make sure your build step includes --platform linux/amd64 so this image is runnable by Antithesis’s AMD64 infrastructure (no ARM).
+
+CMD
+We keep a generic ray start --head as the default so you can still run this container on its own for local testing of Ray + your code. In your docker-compose.yaml or Antithesis project you’ll override the command: to actually spin up your service (or run your tests).
+
+Next steps for Antithesis
+Add a config/ folder alongside your repo (not in the image). Put there:
+
+Your service account JSON under ~/.config/antithesis on your host.
+
+A docker-compose.yaml defining app (this image) plus any databases/mocks.
+
+Validate offline
+
+bash
+Copy
+Edit
+cd config
+unshare -n docker-compose up
+Make sure no container tries to fetch anything from the public Internet at runtime.
+
+Initialize & run a test
+
+bash
+Copy
+Edit
+antithesis init quickstart .           # scaffolds the Antithesis project
+antithesis push-images                # builds & pushes your image to the Antithesis registry
+antithesis run                        # executes your test run on Antithesis
+That’s all you need in your Dockerfile to get your Ray service “Antithesis‑ready.” Let me know if you need help with the docker-compose.yaml or the antithesis CLI commands!

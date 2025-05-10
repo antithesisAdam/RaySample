@@ -1,0 +1,31 @@
+# version: "3.8"
+
+# services:
+#   head:
+#     image: donkey-ray-sample:latest
+#     container_name: ray-head
+#     entrypoint: ["/entrypoint.sh", "head"]
+#     ports:
+#       - "6379:6379"
+#       - "8265:8265"
+#     volumes:
+#       - .:/app
+
+#   worker:
+#     image: donkey-ray-sample:latest
+#     container_name: ray-worker
+#     depends_on:
+#       - head
+#     entrypoint: ["/entrypoint.sh", "worker"]
+#     volumes:
+#       - .:/app
+
+#   trainer:
+#     image: donkey-ray-sample:latest
+#     container_name: ray-trainer
+#     depends_on:
+#       - head
+#       - worker
+#     entrypoint: ["/entrypoint.sh", "trainer"]
+#     volumes:
+#       - .:/app
